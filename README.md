@@ -26,10 +26,17 @@ All data is stored as one versioned document in `localStorage` under `routineBea
 
 **Export settings** downloads that document as a readable JSON backup. **Import settings** parses and validates its schema and routine/phase shape, asks before replacement, then writes it to local storage. JSON is a backup format only; normal editing happens in the Routines and Settings screens.
 
+**Copy share link** creates a URL-safe Base64-encoded link containing the selected routine plus alarm and keyboard preferences. Opening a valid link adds a separate “Shared” copy, selects it, and removes the payload from the address bar. Share URLs require no server, but can become long for large routines and anyone with the link can read its contents; do not put sensitive information in a routine.
+
 ## Timing and controls
 
 Each render derives the scheduled transition timestamp from the next phase's `HH:MM` and the browser's current local date. It subtracts `Date.now()` rather than decrementing a counter, so a throttled or sleeping tab catches up correctly. Reaching a time sounds the alarm but never advances the phase.
 
+When a routine is first started, the first configured phase is the upcoming transition. This means starting a 2:30 routine at 2:47 correctly shows 17 minutes late. Progressing once makes the second phase the upcoming transition, so a 2:45 second phase then shows 2 minutes late. Each further progression compares the clock with the following phase in sequence.
+
+Delay (`S`) changes only the current transition's effective alarm. Before it is due, each press adds one minute. When due/sounding, the first press silences it and sets it to now plus one minute; further presses add a minute. Next (`N`) stops sound and advances. Previous (`P`) returns to the prior transition and restores that transition's alarm delay and silence state, making it safe to correct an accidental advance. Silence (`D`) stops sound without moving the routine. All mappings use `KeyboardEvent.code`, are configurable, and Settings includes a live key/code tester.
+
+Phases may also contain optional required checklist items. Run Mode saves each checked item in today's runtime state and disables both the on-screen Next button and the `N` shortcut until every item in the current phase is checked. Returning with Previous retains the checklist state.
 Delay (`S`) changes only the current transition's effective alarm. Before it is due, each press adds one minute. When due/sounding, the first press silences it and sets it to now plus one minute; further presses add a minute. Next (`N`) stops sound, advances, and clears that delay. Silence (`D`) stops sound without moving the routine. Mappings use `KeyboardEvent.code`, are configurable, and Settings includes a live key/code tester.
 
 ## Browser limitations

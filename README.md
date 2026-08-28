@@ -22,7 +22,7 @@ The application uses only relative URLs, so it works at a repository subpath. Bu
 
 ## Data and backup model
 
-All data is stored as one versioned document in `localStorage` under `routineBeacon.v1`. It contains `schemaVersion`, `appVersion`, routines and phases, the currently viewed routine, preferences, keyboard mappings, and date-and-routine-keyed runtime states. Each runtime contains the local calendar date, routine ID, active phase index, checklist state, and effective alarm timestamp. This allows several routines to retain independent progress while preventing yesterday's state from leaking into today.
+All data is stored as one versioned document in `localStorage` under `routineBeacon.v1`. It contains `schemaVersion`, `appVersion`, routines and phases, the currently viewed routine, preferences, keyboard mappings, and date-and-routine-keyed runtime state. A runtime contains the local calendar date, routine ID, active phase index, checklist state, and effective alarm timestamp. Only one routine may run at a time, and yesterday's state never leaks into today.
 
 **Export settings** downloads that document as a readable JSON backup. **Import settings** parses and validates its schema and routine/phase shape, asks before replacement, then writes it to local storage. JSON is a backup format only; normal editing happens in the Routines and Settings screens.
 
@@ -38,7 +38,7 @@ Delay (`S`) changes only the current transition's effective alarm. Before it is 
 
 Phases may also contain optional required checklist items. Run Mode saves each checked item in today's runtime state and disables both the on-screen Next button and the `N` shortcut until every item in the current phase is checked. Returning with Previous retains the checklist state.
 
-**My Routines** is the operational dashboard rather than an editor. It shows which routines are running, which routine is currently being viewed, and the current/next phase for every active run. From there a caregiver can start, stop, view, or edit any routine. Switching the viewed routine does not reset other running routines. Run Mode gives the current and next scheduled times their own prominent strip directly above the countdown.
+**My Routines** is the operational dashboard rather than an editor. It shows the one active routine, the routine currently being viewed, and current/next phase details. From there a caregiver can view, stop, edit, or **Switch & Start** a routine. Starting a different routine warns that the existing active routine will be stopped and reset; confirming makes the selected routine the sole active routine. This invariant ensures the screen and hardware controls can never progress different routines. Run Mode gives the current and next scheduled times their own prominent strip directly above the countdown.
 
 The application uses a fixed-height shell so the browser page itself never scrolls and the top navigation stays available. Run Mode responsively compresses its panels, countdown, and controls into the available viewport; exceptionally long checklists scroll only inside their checklist panel. Configuration and dashboard content scroll inside the main content region when needed. **Go Fullscreen** is always available in the top bar and changes to **Exit Fullscreen** while active.
 

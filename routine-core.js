@@ -56,6 +56,15 @@ export function freshRuntime(routineId, date = dateKey()) {
     modelVersion: 3,
   };
 }
+export function startExclusiveRuntime(runtimes, routineId, date = dateKey()) {
+  const targetKey = `${date}:${routineId}`;
+  for (const key of Object.keys(runtimes)) {
+    if (key.startsWith(`${date}:`) && key !== targetKey) delete runtimes[key];
+  }
+  const runtime = runtimes[targetKey] || (runtimes[targetKey] = freshRuntime(routineId, date));
+  runtime.started = true;
+  return runtime;
+}
 export function validConfig(value) {
   return value && value.schemaVersion === 1 && Array.isArray(value.routines) && value.routines.length > 0 &&
     value.routines.every(r => typeof r.id==='string' && typeof r.name==='string' && Array.isArray(r.phases) &&

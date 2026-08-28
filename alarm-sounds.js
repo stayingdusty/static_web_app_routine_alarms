@@ -12,15 +12,23 @@ export const ALARM_SOUNDS=[
   {id:'classic',name:'Classic Chime',description:'Simple familiar chime',notes:[[784,0,.25],[1047,.3,.4]]},
 ];
 export const DEFAULT_ALARM_SOUND='sunrise';
+const activeVoices=new WeakMap();
 export function alarmSound(id){return ALARM_SOUNDS.find(sound=>sound.id===id)||ALARM_SOUNDS[0]}
 export function alarmSoundOptions(selected){return ALARM_SOUNDS.map(sound=>`<option value="${sound.id}" ${sound.id===selected?'selected':''}>${sound.name} — ${sound.description}</option>`).join('')}
+export function stopAlarmSound(context){
+  if(!context)return;
+  for(const oscillator of activeVoices.get(context)||[]){try{oscillator.stop()}catch{}try{oscillator.disconnect()}catch{}}
+  activeVoices.delete(context);
+}
 export function playAlarmSound(context,id,volume=.7){
-  const sound=alarmSound(id),start=context.currentTime;
+  stopAlarmSound(context);
+  const sound=alarmSound(id),start=context.currentTime,voices=[];
   for(const [frequency,offset,duration] of sound.notes){
     const oscillator=context.createOscillator(),gain=context.createGain(),peak=Math.max(0,Math.min(1,volume))*.22*(sound.gain??1);
     oscillator.type=sound.wave||'sine';oscillator.frequency.setValueAtTime(frequency,start+offset);
     gain.gain.setValueAtTime(.0001,start+offset);gain.gain.exponentialRampToValueAtTime(Math.max(.0001,peak),start+offset+.025);gain.gain.exponentialRampToValueAtTime(.0001,start+offset+duration);
-    oscillator.connect(gain).connect(context.destination);oscillator.start(start+offset);oscillator.stop(start+offset+duration+.02);
+    oscillator.connect(gain).connect(context.destination);oscillator.start(start+offset);oscillator.stop(start+offset+duration+.02);voices.push(oscillator);
   }
+  activeVoices.set(context,voices);
   return Math.max(...sound.notes.map(([,offset,duration])=>offset+duration));
 }

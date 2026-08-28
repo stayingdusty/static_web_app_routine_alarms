@@ -14,7 +14,7 @@ npm run check
 npm run build       # copies the deployable application to dist/
 ```
 
-Do not open `index.html` directly: a local HTTP server is needed for ES modules, service workers, and wake lock. Audio must be enabled with the in-app button after loading because browsers require a user gesture.
+Do not open `index.html` directly: a local HTTP server is needed for ES modules, service workers, and wake lock. Alarm sound is on by default. Because browsers require a user gesture before audio can play, the app unlocks audio on the first tap or key press; the sound button can also be used to test it.
 
 ## GitHub Pages deployment
 
@@ -40,11 +40,11 @@ Phases may also contain optional required checklist items. Run Mode saves each c
 
 **My Routines** is the operational dashboard rather than an editor. It shows the one active routine, the routine currently being viewed, and current/next phase details. From there a caregiver can view, stop, edit, or **Switch & Start** a routine. Starting a different routine warns that the existing active routine will be stopped and reset; confirming makes the selected routine the sole active routine. This invariant ensures the screen and hardware controls can never progress different routines. Run Mode gives the current and next scheduled times their own prominent strip directly above the countdown.
 
-The application uses a fixed-height shell so the browser page itself never scrolls and the top navigation stays available. Run Mode responsively compresses its panels, countdown, and controls into the available viewport. The current phase checklist occupies the next-phase panel and uses responsive columns instead of a nested scrolling region; the upcoming phase remains visible as a compact summary above it. Configuration and dashboard content scroll inside the main content region when needed. **Go Fullscreen** is always available in the top bar and changes to **Exit Fullscreen** while active.
+The application uses a fixed-height shell so the browser page itself never scrolls and the top navigation stays available. Run Mode responsively compresses its panels, countdown, and controls into the available viewport. The current phase card shows its required checklist when one is configured, or its short description otherwise. The separate upcoming-phase card shows only the next phase and its short description, so checklist ownership is unambiguous. Configuration and dashboard content scroll inside the main content region when needed. **Go Fullscreen** is always available in the top bar and changes to **Exit Fullscreen** while active.
 
 ## Browser limitations
 
-- Audio cannot be guaranteed before the user presses **Enable alarm sound**; operating systems may still suspend background tabs.
+- Audio cannot be guaranteed before the first tap or key press; operating systems may still suspend background tabs.
 - Screen Wake Lock is requested in Run Mode and reacquired when visible, but is unavailable in some browsers and may be revoked by the OS or low battery.
 - Fullscreen and PWA installation depend on browser/platform support. The manifest and simple application-shell service worker allow installation and offline reuse after a successful first load.
 - `localStorage` belongs to a particular browser/origin and can be erased by browser settings; export backups regularly.

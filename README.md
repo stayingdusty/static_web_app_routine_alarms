@@ -37,6 +37,7 @@ When a routine is first started, the first configured phase is the upcoming tran
 Delay (`S`) changes only the current transition's effective alarm. Before it is due, each press adds one minute. When due/sounding, the first press silences it and sets it to now plus one minute; further presses add a minute. Next (`N`) stops sound and advances. Previous (`P`) returns to the prior transition and restores that transition's alarm delay and silence state, making it safe to correct an accidental advance. Silence (`D`) stops sound without moving the routine. All mappings use `KeyboardEvent.code`, are configurable, and Settings includes a live key/code tester.
 
 Phases may also contain optional required checklist items. Run Mode saves each checked item in today's runtime state and disables both the on-screen Next button and the `N` shortcut until every item in the current phase is checked. Returning with Previous retains the checklist state.
+Delay (`S`) changes only the current transition's effective alarm. Before it is due, each press adds one minute. When due/sounding, the first press silences it and sets it to now plus one minute; further presses add a minute. Next (`N`) stops sound, advances, and clears that delay. Silence (`D`) stops sound without moving the routine. Mappings use `KeyboardEvent.code`, are configurable, and Settings includes a live key/code tester.
 
 ## Browser limitations
 

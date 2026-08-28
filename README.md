@@ -30,7 +30,7 @@ All data is stored as one versioned document in `localStorage` under `routineBea
 
 ## Timing and controls
 
-Each render derives the scheduled transition timestamp from the next phase's `HH:MM` and the browser's current local date. It subtracts `Date.now()` rather than decrementing a counter, so a throttled or sleeping tab catches up correctly. Reaching a time sounds the alarm but never advances the phase.
+Each render derives the scheduled transition timestamp from the next phase's `HH:MM` and the browser's current local date. It subtracts `Date.now()` rather than decrementing a counter, so a throttled or sleeping tab catches up correctly. Reaching a time sounds the alarm but never advances the phase. Ten built-in Web Audio melodies are generated locally—without downloads, streams, or audio files—and each phase can use a different sound with an in-editor preview.
 
 When a routine is first started, the first configured phase is the upcoming transition. This means starting a 2:30 routine at 2:47 correctly shows 17 minutes late. Progressing once makes the second phase the upcoming transition, so a 2:45 second phase then shows 2 minutes late. Each further progression compares the clock with the following phase in sequence.
 
@@ -40,7 +40,7 @@ Phases may also contain optional required checklist items. Run Mode saves each c
 
 **My Routines** is the operational dashboard rather than an editor. It shows the one active routine, the routine currently being viewed, and current/next phase details. From there a caregiver can view, stop, edit, or **Switch & Start** a routine. Starting a different routine warns that the existing active routine will be stopped and reset; confirming makes the selected routine the sole active routine. This invariant ensures the screen and hardware controls can never progress different routines. Run Mode gives the current and next scheduled times their own prominent strip directly above the countdown.
 
-The application uses a fixed-height shell so the browser page itself never scrolls and the top navigation stays available. Run Mode responsively compresses its panels, countdown, and controls into the available viewport; exceptionally long checklists scroll only inside their checklist panel. Configuration and dashboard content scroll inside the main content region when needed. **Go Fullscreen** is always available in the top bar and changes to **Exit Fullscreen** while active.
+The application uses a fixed-height shell so the browser page itself never scrolls and the top navigation stays available. Run Mode responsively compresses its panels, countdown, and controls into the available viewport. The current phase checklist occupies the next-phase panel and uses responsive columns instead of a nested scrolling region; the upcoming phase remains visible as a compact summary above it. Configuration and dashboard content scroll inside the main content region when needed. **Go Fullscreen** is always available in the top bar and changes to **Exit Fullscreen** while active.
 
 ## Browser limitations
 

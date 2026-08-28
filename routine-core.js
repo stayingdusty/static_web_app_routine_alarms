@@ -72,9 +72,9 @@ export function validConfig(value) {
         (p.checklist === undefined || (Array.isArray(p.checklist) && p.checklist.every(item => typeof item === 'string')))));
 }
 export function initialData() {
-  const phase=(time,name,description='',checklist=[])=>({id:uid(),time,name,description,checklist,alarm:true,enabled:true,sound:'chime'});
+  const phase=(time,name,description='',checklist=[])=>({id:uid(),time,name,description,checklist,alarm:true,enabled:true,sound:'sunrise'});
   const r={id:uid(),name:'School Morning',days:[1,2,3,4,5],phases:[
     phase('06:15','Meds / Get Ready','Take medicine\nGet dressed\nBrush teeth',['Take medicine','Get dressed','Brush teeth']), phase('06:30','Start Breakfast'),
     phase('06:50','Homework / School Organization'), phase('07:30','Pack Up / Final Prep'), phase('07:50','Leave for School') ]};
-  return {appVersion:'1.1.0',schemaVersion:1,routines:[r],activeRoutineId:r.id,preferences:{sound:'chime',volume:.7},keys:{next:'KeyN',previous:'KeyP',delay:'KeyS',silence:'KeyD'},runtimes:{}};
+  return {appVersion:'1.1.0',schemaVersion:1,routines:[r],activeRoutineId:r.id,preferences:{sound:'sunrise',volume:.7},keys:{next:'KeyN',previous:'KeyP',delay:'KeyS',silence:'KeyD'},runtimes:{}};
 }

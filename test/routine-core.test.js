@@ -1,0 +1,6 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {dateKey,delayAlarm,formatDuration,timestampFor,validConfig,initialData} from '../routine-core.js';
+test('countdown and lateness use timestamps',()=>{assert.equal(formatDuration(600000),'10:00');assert.equal(formatDuration(-1000),'00:01')});
+test('scheduled time is independent from three delays',()=>{const now=new Date(2026,0,1,6,25).getTime(),scheduled=timestampFor('06:30',new Date(now));let alarm=scheduled;alarm=delayAlarm(alarm,now,false);alarm=delayAlarm(alarm,now,false);alarm=delayAlarm(alarm,now,false);assert.equal(scheduled,timestampFor('06:30',new Date(now)));assert.equal(alarm,timestampFor('06:33',new Date(now)))});
+test('due alarm delays from now then accumulates',()=>{const now=100000;let alarm=delayAlarm(90000,now,true);assert.equal(alarm,160000);alarm=delayAlarm(alarm,now,false);alarm=delayAlarm(alarm,now,false);assert.equal(alarm,280000)});
+test('local date separates runtime days',()=>{assert.notEqual(dateKey(new Date(2026,0,1)),dateKey(new Date(2026,0,2)))});
+test('backup validation',()=>{assert.equal(validConfig(initialData()),true);assert.equal(validConfig({schemaVersion:99,routines:[]}),false)});

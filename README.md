@@ -22,7 +22,7 @@ The application uses only relative URLs, so it works at a repository subpath. Bu
 
 ## Data and backup model
 
-All data is stored as one versioned document in `localStorage` under `routineBeacon.v1`. It contains `schemaVersion`, `appVersion`, routines and phases, active routine, preferences, keyboard mappings, and runtime state. Runtime state contains the local calendar date, routine ID, active phase index, and the effective alarm timestamp. A date or active-routine mismatch creates a fresh run, preventing yesterday's snooze from leaking into today.
+All data is stored as one versioned document in `localStorage` under `routineBeacon.v1`. It contains `schemaVersion`, `appVersion`, routines and phases, the currently viewed routine, preferences, keyboard mappings, and date-and-routine-keyed runtime states. Each runtime contains the local calendar date, routine ID, active phase index, checklist state, and effective alarm timestamp. This allows several routines to retain independent progress while preventing yesterday's state from leaking into today.
 
 **Export settings** downloads that document as a readable JSON backup. **Import settings** parses and validates its schema and routine/phase shape, asks before replacement, then writes it to local storage. JSON is a backup format only; normal editing happens in the Routines and Settings screens.
 
@@ -37,7 +37,10 @@ When a routine is first started, the first configured phase is the upcoming tran
 Delay (`S`) changes only the current transition's effective alarm. Before it is due, each press adds one minute. When due/sounding, the first press silences it and sets it to now plus one minute; further presses add a minute. Next (`N`) stops sound and advances. Previous (`P`) returns to the prior transition and restores that transition's alarm delay and silence state, making it safe to correct an accidental advance. Silence (`D`) stops sound without moving the routine. All mappings use `KeyboardEvent.code`, are configurable, and Settings includes a live key/code tester.
 
 Phases may also contain optional required checklist items. Run Mode saves each checked item in today's runtime state and disables both the on-screen Next button and the `N` shortcut until every item in the current phase is checked. Returning with Previous retains the checklist state.
-Delay (`S`) changes only the current transition's effective alarm. Before it is due, each press adds one minute. When due/sounding, the first press silences it and sets it to now plus one minute; further presses add a minute. Next (`N`) stops sound, advances, and clears that delay. Silence (`D`) stops sound without moving the routine. Mappings use `KeyboardEvent.code`, are configurable, and Settings includes a live key/code tester.
+
+**My Routines** is the operational dashboard rather than an editor. It shows which routines are running, which routine is currently being viewed, and the current/next phase for every active run. From there a caregiver can start, stop, view, or edit any routine. Switching the viewed routine does not reset other running routines. Run Mode gives the current and next scheduled times their own prominent strip directly above the countdown.
+
+The application uses a fixed-height shell so the browser page itself never scrolls and the top navigation stays available. Run Mode responsively compresses its panels, countdown, and controls into the available viewport; exceptionally long checklists scroll only inside their checklist panel. Configuration and dashboard content scroll inside the main content region when needed. **Go Fullscreen** is always available in the top bar and changes to **Exit Fullscreen** while active.
 
 ## Browser limitations
 

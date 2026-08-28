@@ -30,7 +30,7 @@ All data is stored as one versioned document in `localStorage` under `routineBea
 
 ## Timing and controls
 
-Each render derives the scheduled transition timestamp from the next phase's `HH:MM` and the browser's current local date. It subtracts `Date.now()` rather than decrementing a counter, so a throttled or sleeping tab catches up correctly. Reaching a time sounds the alarm but never advances the phase. Ten built-in Web Audio melodies are generated locally—without downloads, streams, or audio files—and each phase can use a different sound with an in-editor preview.
+Each render derives the scheduled transition timestamp from the next phase's `HH:MM` and the browser's current local date. It subtracts `Date.now()` rather than decrementing a counter, so a throttled or sleeping tab catches up correctly. Reaching a time sounds the alarm but never advances the phase. The selected melody repeats with a one-second pause until the alarm is silenced, delayed, or the routine moves to another phase. Enabling audio after an alarm is already due starts that repeating alarm immediately. Ten built-in Web Audio melodies are generated locally—without downloads, streams, or audio files—and each phase can use a different sound with an in-editor preview.
 
 When a routine is first started, the first configured phase is the upcoming transition. This means starting a 2:30 routine at 2:47 correctly shows 17 minutes late. Progressing once makes the second phase the upcoming transition, so a 2:45 second phase then shows 2 minutes late. Each further progression compares the clock with the following phase in sequence.
 

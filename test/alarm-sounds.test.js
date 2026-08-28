@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ALARM_SOUNDS,alarmSound,alarmSoundOptions,playAlarmSound,stopAlarmSound} from '../alarm-sounds.js';
+import {ALARM_REPEAT_DELAY_SECONDS,ALARM_SOUNDS,alarmSound,alarmSoundOptions,playAlarmSound,repeatAlarmSound,stopAlarmSound} from '../alarm-sounds.js';
 
 test('alarm library provides a sizeable unique offline selection',()=>{
   assert.ok(ALARM_SOUNDS.length>=10);
@@ -26,4 +26,18 @@ test('alarm playback can be stopped immediately when changing phases',()=>{
   stopAlarmSound(context);
   assert.equal(stopped-scheduledStops,alarmSound('attention').notes.length);
   assert.equal(disconnected,alarmSound('attention').notes.length);
+});
+
+test('alarm repeats after a consistent pause until it is stopped',t=>{
+  t.mock.timers.enable({apis:['setTimeout']});
+  let started=0;
+  const parameter={setValueAtTime(){},exponentialRampToValueAtTime(){}},context={currentTime:0,destination:{},createOscillator:()=>({frequency:parameter,connect(){return this},start(){started++},stop(){},disconnect(){}}),createGain:()=>({gain:parameter,connect(){return this}})};
+  const notesPerPlay=alarmSound('sunrise').notes.length;
+  repeatAlarmSound(context,'sunrise');
+  assert.equal(started,notesPerPlay);
+  t.mock.timers.tick((.62+ALARM_REPEAT_DELAY_SECONDS)*1000);
+  assert.equal(started,notesPerPlay*2);
+  stopAlarmSound(context);
+  t.mock.timers.tick(10000);
+  assert.equal(started,notesPerPlay*2);
 });

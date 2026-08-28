@@ -13,15 +13,19 @@ export const ALARM_SOUNDS=[
 ];
 export const DEFAULT_ALARM_SOUND='sunrise';
 const activeVoices=new WeakMap();
+const activeRepeats=new WeakMap();
+export const ALARM_REPEAT_DELAY_SECONDS=1;
 export function alarmSound(id){return ALARM_SOUNDS.find(sound=>sound.id===id)||ALARM_SOUNDS[0]}
 export function alarmSoundOptions(selected){return ALARM_SOUNDS.map(sound=>`<option value="${sound.id}" ${sound.id===selected?'selected':''}>${sound.name} — ${sound.description}</option>`).join('')}
 export function stopAlarmSound(context){
   if(!context)return;
+  const repeat=activeRepeats.get(context);if(repeat)clearTimeout(repeat.timer);
+  activeRepeats.delete(context);
   for(const oscillator of activeVoices.get(context)||[]){try{oscillator.stop()}catch{}try{oscillator.disconnect()}catch{}}
   activeVoices.delete(context);
 }
 export function playAlarmSound(context,id,volume=.7){
-  stopAlarmSound(context);
+  for(const oscillator of activeVoices.get(context)||[]){try{oscillator.stop()}catch{}try{oscillator.disconnect()}catch{}}
   const sound=alarmSound(id),start=context.currentTime,voices=[];
   for(const [frequency,offset,duration] of sound.notes){
     const oscillator=context.createOscillator(),gain=context.createGain(),peak=Math.max(0,Math.min(1,volume))*.22*(sound.gain??1);
@@ -31,4 +35,14 @@ export function playAlarmSound(context,id,volume=.7){
   }
   activeVoices.set(context,voices);
   return Math.max(...sound.notes.map(([,offset,duration])=>offset+duration));
+}
+export function repeatAlarmSound(context,id,volume=.7,repeatDelay=ALARM_REPEAT_DELAY_SECONDS){
+  stopAlarmSound(context);
+  const repeat={timer:null};activeRepeats.set(context,repeat);
+  const play=()=>{
+    if(activeRepeats.get(context)!==repeat)return;
+    const duration=playAlarmSound(context,id,volume);
+    repeat.timer=setTimeout(play,(duration+repeatDelay)*1000);
+  };
+  play();
 }

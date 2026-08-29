@@ -35,6 +35,16 @@ export function timestampForPhase(phases, phaseIndex, routineDate = dateKey()) {
   date.setDate(date.getDate() + dayOffset);
   return timestampFor(phases[phaseIndex].time, date);
 }
+export function defaultRoutineFinishTime(phases = []) {
+  const time = phases.at(-1)?.time || '08:00';
+  const [hour, minute] = time.split(':').map(Number);
+  const total = (hour * 60 + minute + 15) % (24 * 60);
+  return `${String(Math.floor(total / 60)).padStart(2,'0')}:${String(total % 60).padStart(2,'0')}`;
+}
+export function timestampForRoutineFinish(routine, routineDate = dateKey()) {
+  const phases = (routine.phases || []).filter(phase => phase.enabled !== false);
+  return timestampForPhase([...phases, {time:routine.finishTime || defaultRoutineFinishTime(phases)}], phases.length, routineDate);
+}
 export function nextScheduledOccurrence(routines, after = new Date(), maxDays = 14) {
   let best = null;
   for (let offset = 0; offset <= maxDays; offset++) {
@@ -99,6 +109,7 @@ export function decodeSharePayload(value) {
 const routineShape = routine => ({
   name: routine.name,
   days: routine.days || [],
+  finishTime: routine.finishTime || defaultRoutineFinishTime(routine.phases),
   phases: (routine.phases || []).map(phase => ({
     time: phase.time, name: phase.name, description: phase.description || '', checklist: phase.checklist || [],
     alarm: phase.alarm !== false, enabled: phase.enabled !== false, sound: phase.sound || 'sunrise',
@@ -125,15 +136,17 @@ export function addSharedRoutine(config, sharedRoutine) {
 }
 export function encodeRoutineShare(routine) {
   const compact = routineShape(routine);
-  return encodeSharePayload({v:2,r:[compact.name,compact.days,compact.phases.map(p=>[
+  return encodeSharePayload({v:3,r:[compact.name,compact.days,compact.finishTime,compact.phases.map(p=>[
     p.time,p.name,p.description,p.checklist,p.alarm?1:0,p.enabled?1:0,p.sound,
   ])]});
 }
 export function decodeRoutineShare(value) {
   const payload = decodeSharePayload(value);
-  if (payload.v !== 2 || !Array.isArray(payload.r)) return payload;
-  const [name,days,phases] = payload.r;
-  return {schemaVersion:1,routine:{id:uid(),name,days,phases:phases.map(p=>({
+  if (![2,3].includes(payload.v) || !Array.isArray(payload.r)) return payload;
+  const [name,days,finishOrPhases,sharedPhases] = payload.r;
+  const phases = payload.v === 3 ? sharedPhases : finishOrPhases;
+  const finishTime = payload.v === 3 ? finishOrPhases : defaultRoutineFinishTime(phases.map(p=>({time:p[0]})));
+  return {schemaVersion:1,routine:{id:uid(),name,days,finishTime,phases:phases.map(p=>({
     id:uid(),time:p[0],name:p[1],description:p[2]||'',checklist:p[3]||[],alarm:p[4]!==0,enabled:p[5]!==0,sound:p[6]||'sunrise',
   }))}};
 }
@@ -162,13 +175,14 @@ export function startExclusiveRuntime(runtimes, routineId, date = dateKey()) {
 }
 export function validConfig(value) {
   return value && value.schemaVersion === 1 && Array.isArray(value.routines) &&
-    value.routines.every(r => typeof r.id==='string' && typeof r.name==='string' && Array.isArray(r.phases) &&
+    value.routines.every(r => typeof r.id==='string' && typeof r.name==='string' &&
+      (r.finishTime === undefined || /^\d\d:\d\d$/.test(r.finishTime)) && Array.isArray(r.phases) &&
       r.phases.every(p => typeof p.id==='string' && typeof p.name==='string' && /^\d\d:\d\d$/.test(p.time) &&
         (p.checklist === undefined || (Array.isArray(p.checklist) && p.checklist.every(item => typeof item === 'string')))));
 }
 export function initialData() {
   const phase=(time,name,description='',checklist=[])=>({id:uid(),time,name,description,checklist,alarm:true,enabled:true,sound:'sunrise'});
-  const r={id:uid(),name:'School Morning',days:[1,2,3,4,5],phases:[
+  const r={id:uid(),name:'School Morning',days:[1,2,3,4,5],finishTime:'08:00',phases:[
     phase('06:15','Meds / Get Ready','Take medicine\nGet dressed\nBrush teeth',['Take medicine','Get dressed','Brush teeth']), phase('06:30','Start Breakfast'),
     phase('06:50','Homework / School Organization'), phase('07:30','Pack Up / Final Prep'), phase('07:50','Leave for School') ]};
   return {appVersion:'1.1.0',schemaVersion:1,routines:[r],activeRoutineId:r.id,preferences:{sound:'sunrise',volume:.7},keys:{next:'Enter',previous:'KeyP',delay:'Space',silence:'KeyD'},keyDefaultsVersion:2,runtimes:{}};

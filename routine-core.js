@@ -24,6 +24,18 @@ export function nextScheduledOccurrence(routines, after = new Date(), maxDays = 
   }
   return best;
 }
+export function activeRoutineOccurrence(routine, now = new Date(), completedToday = false, maxDays = 14) {
+  const first = routine?.phases?.find(phase => phase.enabled);
+  if (!first || !routine.days?.length) return null;
+  for (let offset = 0; offset <= maxDays; offset++) {
+    if (offset === 0 && completedToday) continue;
+    const day = new Date(now);
+    day.setDate(now.getDate() + offset);
+    if (!routine.days.includes(day.getDay())) continue;
+    return {routineId: routine.id, date: dateKey(day), scheduledAt: timestampFor(first.time, day)};
+  }
+  return null;
+}
 export function formatDuration(ms) {
   const seconds = Math.max(0, Math.floor(Math.abs(ms)/1000));
   const h = Math.floor(seconds/3600), m = Math.floor((seconds%3600)/60), s = seconds%60;

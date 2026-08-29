@@ -14,7 +14,7 @@ npm run check
 npm run build       # copies the deployable application to dist/
 ```
 
-Do not open `index.html` directly: a local HTTP server is needed for ES modules, service workers, and wake lock. Alarm sound is on by default. Because browsers require a user gesture before audio can play, the app unlocks audio on the first tap or key press; the sound button can also be used to test it.
+Do not open `index.html` directly: a local HTTP server is needed for ES modules, service workers, and wake lock. Alarm sound is on by default. Because browsers require a user gesture before audio can play, the app unlocks audio on the first tap or key press; sound previews in the editor and Settings can also be used to test it.
 
 ## GitHub Pages deployment
 
@@ -30,21 +30,21 @@ All data is stored as one versioned document in `localStorage` under `routineBea
 
 ## Timing and controls
 
-Each render derives the scheduled transition timestamp from the next phase's `HH:MM` and the browser's current local date. It subtracts `Date.now()` rather than decrementing a counter, so a throttled or sleeping tab catches up correctly. Reaching a time sounds the alarm but never advances the phase. The selected melody repeats with a one-second pause until the alarm is silenced, delayed, or the routine moves to another phase. Enabling audio after an alarm is already due starts that repeating alarm immediately. Ten built-in Web Audio melodies are generated locally—without downloads, streams, or audio files—and each phase can use a different sound with an in-editor preview.
+Each render derives the scheduled transition timestamp from the next phase's `HH:MM` and the browser's current local date. It subtracts `Date.now()` rather than decrementing a counter, so a throttled or sleeping tab catches up correctly. Reaching a time sounds the alarm but never advances the phase. The selected melody repeats with a one-second pause until the alarm is delayed or the routine moves to another phase. Enabling audio after an alarm is already due starts that repeating alarm immediately. Ten built-in Web Audio melodies are generated locally—without downloads, streams, or audio files—and each phase can use a different sound with an in-editor preview.
 
 When a routine is started, the first configured phase immediately becomes the current phase, with its name, instructions, checklist, and scheduled start time visible. The countdown targets the second phase as the upcoming transition. Each progression makes that upcoming phase current, and the final phase remains visible until the routine is explicitly completed.
 
-Delay (`S`) changes only the current transition's effective alarm. Before it is due, each press adds one minute. When due/sounding, the first press silences it and sets it to now plus one minute; further presses add a minute. Next (`N`) stops sound and advances. Previous (`P`) returns to the prior transition and restores that transition's alarm delay and silence state, making it safe to correct an accidental advance. Silence (`D`) stops sound without moving the routine. All mappings use `KeyboardEvent.code`, are configurable, and Settings includes a live key/code tester.
+Delay (`S`) changes only the current transition's effective alarm. Before it is due, each press adds one minute. When due/sounding, the first press stops the current alarm and sets it to now plus one minute; further presses add a minute. Next (`N`) stops sound and advances. Previous (`P`) returns to the prior transition and restores that transition's alarm delay, making it safe to correct an accidental advance. Alarms cannot be silenced independently. All mappings use `KeyboardEvent.code`, are configurable, and Settings includes a live key/code tester.
 
 Phases may also contain optional required checklist items. Run Mode saves each checked item in today's runtime state and disables both the on-screen Next button and the `N` shortcut until every item in the current phase is checked. Returning with Previous retains the checklist state.
 
 **My Routines** is the operational dashboard rather than an editor. It shows the one active routine, the routine currently being viewed, and current/next phase details. From there a caregiver can view, stop, edit, or **Switch & Start** a routine. Starting a different routine warns that the existing active routine will be stopped and reset; confirming makes the selected routine the sole active routine. This invariant ensures the screen and hardware controls can never progress different routines. Run Mode gives the current and next scheduled times their own prominent strip directly above the countdown.
 
-The application uses a fixed-height shell so the browser page itself never scrolls and the top navigation stays available. Run Mode responsively compresses its panels, countdown, and controls into the available viewport. The current phase card shows its required checklist when one is configured, or its short description otherwise. The separate upcoming-phase card shows only the next phase and its short description, so checklist ownership is unambiguous. Configuration and dashboard content scroll inside the main content region when needed. **Go Fullscreen** is always available in the top bar and changes to **Exit Fullscreen** while active.
+The application uses a fixed-height shell so the browser page itself never scrolls and the top navigation stays available. Run Mode responsively compresses its panels, countdown, and controls into the available viewport. The current phase card shows its required checklist when one is configured, or its short description otherwise. The separate upcoming-phase card shows only the next phase and its short description, so checklist ownership is unambiguous. Configuration and dashboard content scroll inside the main content region when needed. **Reset today** is always available in the top bar, while routine navigation stays focused on My Routines, Edit, and Settings.
 
 ## Browser limitations
 
 - Audio cannot be guaranteed before the first tap or key press; operating systems may still suspend background tabs.
 - Screen Wake Lock is requested in Run Mode and reacquired when visible, but is unavailable in some browsers and may be revoked by the OS or low battery.
-- Fullscreen and PWA installation depend on browser/platform support. The manifest and simple application-shell service worker allow installation and offline reuse after a successful first load.
+- PWA installation depends on browser/platform support. The manifest and simple application-shell service worker allow installation and offline reuse after a successful first load.
 - `localStorage` belongs to a particular browser/origin and can be erased by browser settings; export backups regularly.

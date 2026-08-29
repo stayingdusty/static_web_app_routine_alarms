@@ -73,3 +73,11 @@ main{width:100%;height:100%;min-height:0;overflow:hidden;padding-top:clamp(.5rem
    kept separate from the editing actions so the header remains clear on phones. */
 .editor-back{margin-bottom:1rem;background:transparent;border:1px solid #58708a;color:#cbd5e1}.editor-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}.editor-heading h1{overflow-wrap:anywhere}.edit-status{flex:none;border-radius:2rem;padding:.45rem .7rem;background:#07111f;color:var(--cyan);font-size:.8rem;font-weight:900}.editor-actions{margin:.25rem 0 1.2rem;padding:.8rem 0;border-top:1px solid #ffffff18;border-bottom:1px solid #ffffff18}.phase{border:1px solid #ffffff18;border-radius:1rem;margin:.75rem 0;padding:1rem;background:#0c192a}.phase:first-child{border-top:1px solid #ffffff18}
 @media(max-width:600px){#setup .panel{padding:.9rem}#setup .editor-heading{display:block}#setup .edit-status{display:inline-block;margin:-.5rem 0 .9rem}#setup .editor-actions{display:grid;grid-template-columns:1fr 1fr}#setup .editor-actions button{min-width:0;padding:.7rem .4rem}#setup .editor-actions .primary,#setup .editor-actions .danger{grid-column:1/-1}#setup .days{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}#setup .days label{margin:0;text-align:center;padding:.55rem .2rem}#setup .phase{display:grid;grid-template-columns:1fr;padding:.8rem}#setup .phase>input[type=time]{width:100%;min-height:48px}#setup .phase-controls{display:grid;grid-template-columns:repeat(3,1fr);grid-column:auto}#setup .phase-controls button{min-height:44px}#setup .checklist-editor{border-left:0;border-top:3px solid var(--cyan);padding:.7rem 0 0}#setup .check-item{grid-template-columns:minmax(0,1fr) 44px}#setup textarea{min-height:72px}}
+
+/* Native time inputs can include an AM/PM segment. Give that control enough
+   room and let every grid track shrink without pushing past the editor card. */
+.phase{grid-template-columns:minmax(0,9.5rem) minmax(0,1fr) auto}
+.phase>input[type=time]{display:block;width:100%;min-width:0;max-width:100%;padding:.65rem .35rem;background:#07111f;border:1px solid #58708a;border-radius:.5rem;color:white}
+.phase-fields,.phase-controls{min-width:0}
+.empty-state{text-align:center;max-width:680px;margin-inline:auto}
+@media(max-width:600px){#setup .phase{grid-template-columns:minmax(0,1fr)}}

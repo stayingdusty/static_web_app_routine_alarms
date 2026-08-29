@@ -63,6 +63,7 @@ export function startExclusiveRuntime(runtimes, routineId, date = dateKey()) {
   }
   const runtime = runtimes[targetKey] || (runtimes[targetKey] = freshRuntime(routineId, date));
   runtime.started = true;
+  if (runtime.phaseIndex < 0) runtime.phaseIndex = 0;
   return runtime;
 }
 export function validConfig(value) {

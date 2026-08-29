@@ -9,6 +9,21 @@ export function timestampFor(time, now = new Date()) {
   const [h,m] = time.split(':').map(Number); const d = new Date(now);
   d.setHours(h,m,0,0); return d.getTime();
 }
+export function nextScheduledOccurrence(routines, after = new Date(), maxDays = 14) {
+  let best = null;
+  for (let offset = 0; offset <= maxDays; offset++) {
+    const day = new Date(after);
+    day.setDate(after.getDate() + offset);
+    for (const routine of routines) {
+      const first = routine.phases?.find(phase => phase.enabled);
+      if (!first || !routine.days?.includes(day.getDay())) continue;
+      const scheduledAt = timestampFor(first.time, day);
+      if (scheduledAt <= after.getTime() || (best && scheduledAt >= best.scheduledAt)) continue;
+      best = {routineId: routine.id, date: dateKey(day), scheduledAt};
+    }
+  }
+  return best;
+}
 export function formatDuration(ms) {
   const seconds = Math.max(0, Math.floor(Math.abs(ms)/1000));
   const h = Math.floor(seconds/3600), m = Math.floor((seconds%3600)/60), s = seconds%60;

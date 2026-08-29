@@ -5,6 +5,19 @@ export const dateKey = (d = new Date()) => {
   return `${y}-${m}-${day}`;
 };
 export const uid = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`;
+export const runtimeKeyFor = (routineId, date = dateKey()) => `${date}:${routineId}`;
+export function applyDefaultKeyMappings(config) {
+  config.keys ||= {};
+  if (!config.keyDefaultsVersion) {
+    if (config.keys.next === 'KeyN') config.keys.next = 'Enter';
+    if (config.keys.delay === 'KeyS') config.keys.delay = 'Space';
+    config.keyDefaultsVersion = 2;
+  }
+  config.keys.previous ||= 'KeyP';
+  config.keys.next ||= 'Enter';
+  config.keys.delay ||= 'Space';
+  return config;
+}
 export function timestampFor(time, now = new Date()) {
   const [h,m] = time.split(':').map(Number); const d = new Date(now);
   d.setHours(h,m,0,0); return d.getTime();
@@ -83,6 +96,31 @@ export function decodeSharePayload(value) {
   const binary = atob(base64);
   return JSON.parse(new TextDecoder().decode(Uint8Array.from(binary, char => char.charCodeAt(0))));
 }
+const routineShape = routine => ({
+  name: routine.name,
+  days: routine.days || [],
+  phases: (routine.phases || []).map(phase => ({
+    time: phase.time, name: phase.name, description: phase.description || '', checklist: phase.checklist || [],
+    alarm: phase.alarm !== false, enabled: phase.enabled !== false, sound: phase.sound || 'sunrise',
+  })),
+});
+export function routineFingerprint(routine) {
+  return JSON.stringify(routineShape(routine));
+}
+export function encodeRoutineShare(routine) {
+  const compact = routineShape(routine);
+  return encodeSharePayload({v:2,r:[compact.name,compact.days,compact.phases.map(p=>[
+    p.time,p.name,p.description,p.checklist,p.alarm?1:0,p.enabled?1:0,p.sound,
+  ])]});
+}
+export function decodeRoutineShare(value) {
+  const payload = decodeSharePayload(value);
+  if (payload.v !== 2 || !Array.isArray(payload.r)) return payload;
+  const [name,days,phases] = payload.r;
+  return {schemaVersion:1,routine:{id:uid(),name,days,phases:phases.map(p=>({
+    id:uid(),time:p[0],name:p[1],description:p[2]||'',checklist:p[3]||[],alarm:p[4]!==0,enabled:p[5]!==0,sound:p[6]||'sunrise',
+  }))}};
+}
 export function freshRuntime(routineId, date = dateKey()) {
   return {
     date,
@@ -117,5 +155,5 @@ export function initialData() {
   const r={id:uid(),name:'School Morning',days:[1,2,3,4,5],phases:[
     phase('06:15','Meds / Get Ready','Take medicine\nGet dressed\nBrush teeth',['Take medicine','Get dressed','Brush teeth']), phase('06:30','Start Breakfast'),
     phase('06:50','Homework / School Organization'), phase('07:30','Pack Up / Final Prep'), phase('07:50','Leave for School') ]};
-  return {appVersion:'1.1.0',schemaVersion:1,routines:[r],activeRoutineId:r.id,preferences:{sound:'sunrise',volume:.7},keys:{next:'KeyN',previous:'KeyP',delay:'KeyS',silence:'KeyD'},runtimes:{}};
+  return {appVersion:'1.1.0',schemaVersion:1,routines:[r],activeRoutineId:r.id,preferences:{sound:'sunrise',volume:.7},keys:{next:'Enter',previous:'KeyP',delay:'Space',silence:'KeyD'},keyDefaultsVersion:2,runtimes:{}};
 }

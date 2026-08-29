@@ -107,6 +107,22 @@ const routineShape = routine => ({
 export function routineFingerprint(routine) {
   return JSON.stringify(routineShape(routine));
 }
+export function addSharedRoutine(config, sharedRoutine) {
+  const duplicate = config.routines.find(routine => routineFingerprint(routine) === routineFingerprint(sharedRoutine));
+  if (duplicate) {
+    config.activeRoutineId = duplicate.id;
+    return {routine: duplicate, imported: false};
+  }
+  const routine = structuredClone(sharedRoutine);
+  routine.id = uid();
+  routine.phases.forEach(phase => {
+    phase.id = uid();
+    phase.checklist ||= [];
+  });
+  config.routines.push(routine);
+  config.activeRoutineId = routine.id;
+  return {routine, imported: true};
+}
 export function encodeRoutineShare(routine) {
   const compact = routineShape(routine);
   return encodeSharePayload({v:2,r:[compact.name,compact.days,compact.phases.map(p=>[
@@ -145,7 +161,7 @@ export function startExclusiveRuntime(runtimes, routineId, date = dateKey()) {
   return runtime;
 }
 export function validConfig(value) {
-  return value && value.schemaVersion === 1 && Array.isArray(value.routines) && value.routines.length > 0 &&
+  return value && value.schemaVersion === 1 && Array.isArray(value.routines) &&
     value.routines.every(r => typeof r.id==='string' && typeof r.name==='string' && Array.isArray(r.phases) &&
       r.phases.every(p => typeof p.id==='string' && typeof p.name==='string' && /^\d\d:\d\d$/.test(p.time) &&
         (p.checklist === undefined || (Array.isArray(p.checklist) && p.checklist.every(item => typeof item === 'string')))));

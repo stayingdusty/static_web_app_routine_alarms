@@ -11,20 +11,32 @@ main{width:100%;height:100%;min-height:0;overflow:hidden;padding-top:clamp(.5rem
 .view{height:100%;min-height:0;max-width:100%;overflow:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable}
 #run{overflow:hidden;display:flex;flex-direction:column;gap:clamp(.35rem,1vh,.8rem)}
 #run .run-context,#run .run-grid,#run .schedule-strip,#run .timer,#run .timer-label,#run .delay-note,#run .actions,#run .minor-actions{margin-top:0;margin-bottom:0;flex:none}
-#run .run-grid{flex:1 1 auto;min-height:0}
-#run .hero{min-width:0;min-height:0;height:100%;overflow:hidden;padding:clamp(.8rem,2.2vh,2rem)}
+#run .run-grid{display:block;flex:1 1 auto;min-height:0}
+#run .hero{min-width:0;min-height:0;height:100%;overflow:auto;padding:clamp(.8rem,2.2vh,2rem);scrollbar-gutter:stable}
 #run .current-name,#run .next-name{font-size:clamp(1.8rem,5.5vmin,4.5rem);margin:.2em 0}
 #run .instructions{font-size:clamp(1rem,2.2vmin,1.6rem)}
-#run .run-grid.has-checklist{grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr)}
+#run .run-grid.has-checklist{grid-template-columns:none}
 #run .schedule-strip{padding:clamp(.5rem,1.2vh,1rem)}
 #run .schedule-strip strong{font-size:clamp(1.25rem,3.5vmin,2.25rem)}
 #run .timer{font-size:clamp(3rem,11vh,8rem);line-height:.82}
 #run .timer-label{font-size:clamp(.9rem,2.4vh,1.6rem)}
+#run .countdown-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,25%);align-items:center;gap:clamp(.75rem,2vw,1.5rem);flex:none}
+#run .countdown{min-width:0}
+#run .next-indicator{min-width:0;padding:.55rem 0 .55rem clamp(.75rem,2vw,1.25rem);border-left:1px solid #ffffff2b;color:#a9bdd0}
+#run .next-indicator span{display:block;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.12em;font-size:clamp(.65rem,1.4vmin,.78rem);font-weight:900}
+#run .next-indicator strong{display:block;overflow-wrap:anywhere;color:#d7e2ec;font-size:clamp(.95rem,2vmin,1.3rem);line-height:1.15}
+#run .current-heading{display:flex;align-items:start;justify-content:space-between;gap:1rem;flex:none}
+#run .current-scheduled{display:grid;gap:.15rem;text-align:right;color:#9db1c5;white-space:nowrap}
+#run .current-scheduled span{text-transform:uppercase;letter-spacing:.12em;font-size:.65rem;font-weight:900}
+#run .current-scheduled strong{color:#d7e2ec;font-size:1rem}
+#run .run-checklist{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));align-content:start;gap:clamp(.3rem,.8vh,.5rem)}
+#run .run-checklist label{align-items:flex-start;padding:clamp(.42rem,.8vh,.6rem);font-size:clamp(.88rem,1.8vmin,1.08rem);line-height:1.15;overflow-wrap:anywhere}
+#run .run-checklist input{width:1.4rem;height:1.4rem;margin:0;flex:none}
 #run .delay-note{font-size:clamp(.9rem,2vh,1.3rem);min-height:1.4em}
 #run .actions{gap:clamp(.4rem,1vw,1rem)}
 #run .actions button{min-height:clamp(58px,9vh,90px);font-size:clamp(1rem,2.3vmin,1.65rem)}
 #run .minor-actions{margin-top:0}
-@media(max-width:700px){header{padding:.4rem .6rem}header nav{width:100%;justify-content:center;gap:.25rem}header nav button{padding:.55rem .65rem;font-size:.82rem}main{padding:.5rem}.fullscreen-top{order:-1}#run .run-grid,#run .run-grid.has-checklist{grid-template-columns:1fr;grid-template-rows:minmax(0,.75fr) minmax(0,1.25fr)}#run .hero{padding:.7rem}.run-checklist{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))}#run .actions button{min-height:52px}.run-context{padding:.45rem .65rem}}
+@media(max-width:700px){header{padding:.4rem .6rem}header nav{width:100%;justify-content:center;gap:.25rem}header nav button{padding:.55rem .65rem;font-size:.82rem}main{padding:.5rem}.fullscreen-top{order:-1}#run .run-grid,#run .run-grid.has-checklist{display:block}#run .hero{padding:.7rem}.run-checklist{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))}#run .countdown-row{grid-template-columns:minmax(0,1fr) minmax(120px,32%)}#run .actions button{min-height:52px}.run-context{padding:.45rem .65rem}}
 @media(max-height:700px){#run{gap:.3rem}#run .run-context{padding:.35rem .65rem}#run .schedule-strip{padding:.35rem}#run .timer{font-size:clamp(2.5rem,9vh,5rem)}#run .minor-actions button{padding:.45rem .65rem}#run .eyebrow{font-size:.7rem}#run .actions button{min-height:48px}}
 
 /* Tablet browsers retain sizeable address and tab bars in landscape.  In that

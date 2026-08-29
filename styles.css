@@ -56,9 +56,9 @@ main{width:100%;height:100%;min-height:0;overflow:hidden;padding-top:clamp(.5rem
    from the phase cards or their checklist. */
 .alarm-alert{display:flex;align-items:center;gap:.35rem;flex:none;white-space:nowrap;background:var(--red);color:#210009;border-radius:.65rem;padding:.4rem .65rem;font-size:.85rem;font-weight:950;letter-spacing:.04em}
 .alarm-alert [aria-hidden]{animation:alarm-ring 1s ease-in-out infinite;transform-origin:50% 10%}
-.routine-complete{text-align:center}.complete-actions{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.complete-actions button{min-height:100px;font-size:clamp(1.2rem,3vw,2rem)}
+.routine-complete{text-align:center}.complete-actions{display:grid;gap:1rem;max-width:850px;margin:1rem auto 0}.complete-actions .complete-confirm{min-height:100px;font-size:clamp(1.2rem,3vw,2rem);box-shadow:0 .5rem 1.5rem #0005}.complete-secondary{display:flex;justify-content:center;gap:.65rem;flex-wrap:wrap}.complete-secondary button,.secondary{min-height:48px;background:#273955;color:#cbd5e1;font-size:1rem}.complete-secondary [data-reset-today]{background:transparent;border:1px solid #58708a}
 @keyframes alarm-ring{0%,45%,100%{transform:rotate(0)}15%{transform:rotate(12deg)}30%{transform:rotate(-12deg)}}
-@media(max-width:500px){.run-context>span{display:none}.run-context strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.alarm-alert{padding:.35rem .5rem;font-size:.75rem}.run-context button{padding:.55rem .65rem}.complete-actions{grid-template-columns:1fr}.complete-actions button{min-height:70px}}
+@media(max-width:500px){.run-context>span{display:none}.run-context strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.alarm-alert{padding:.35rem .5rem;font-size:.75rem}.run-context button{padding:.55rem .65rem}.complete-actions .complete-confirm{min-height:78px}.complete-secondary button{min-height:48px}}
 
 /* Conservative tablet sizing and fallbacks for older WebKit. Run Mode may
    scroll as a last resort, so controls can never collide or leave the viewport. */

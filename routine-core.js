@@ -19,7 +19,7 @@ export function delayAlarm(effective, now, isDue) {
 }
 export function phaseContext(phases, phaseIndex) {
   return {
-    current: phaseIndex >= 0 ? phases[phaseIndex] : null,
+    current: phaseIndex >= 0 ? phases[phaseIndex] || null : null,
     next: phases[phaseIndex + 1] || null,
   };
 }
@@ -47,13 +47,13 @@ export function freshRuntime(routineId, date = dateKey()) {
   return {
     date,
     routineId,
-    phaseIndex: -1,
+    phaseIndex: 0,
     effectiveAlarm: null,
     silenced: false,
     started: false,
     alarmStates: {},
     checklistStates: {},
-    modelVersion: 3,
+    modelVersion: 4,
   };
 }
 export function startExclusiveRuntime(runtimes, routineId, date = dateKey()) {

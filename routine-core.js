@@ -47,7 +47,7 @@ export function freshRuntime(routineId, date = dateKey()) {
   return {
     date,
     routineId,
-    phaseIndex: 0,
+    phaseIndex: -1,
     effectiveAlarm: null,
     silenced: false,
     started: false,

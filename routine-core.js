@@ -9,6 +9,19 @@ export function timestampFor(time, now = new Date()) {
   const [h,m] = time.split(':').map(Number); const d = new Date(now);
   d.setHours(h,m,0,0); return d.getTime();
 }
+export function timestampForPhase(phases, phaseIndex, routineDate = dateKey()) {
+  const [year,month,day] = routineDate.split('-').map(Number);
+  const date = new Date(year,month-1,day);
+  let dayOffset = 0, previousMinutes = null;
+  for (let index = 0; index <= phaseIndex; index++) {
+    const [hour,minute] = phases[index].time.split(':').map(Number);
+    const minutes = hour * 60 + minute;
+    if (previousMinutes !== null && minutes < previousMinutes) dayOffset++;
+    previousMinutes = minutes;
+  }
+  date.setDate(date.getDate() + dayOffset);
+  return timestampFor(phases[phaseIndex].time, date);
+}
 export function nextScheduledOccurrence(routines, after = new Date(), maxDays = 14) {
   let best = null;
   for (let offset = 0; offset <= maxDays; offset++) {

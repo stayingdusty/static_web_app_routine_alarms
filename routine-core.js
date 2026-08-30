@@ -41,6 +41,17 @@ export function defaultRoutineFinishTime(phases = []) {
   const total = (hour * 60 + minute + 15) % (24 * 60);
   return `${String(Math.floor(total / 60)).padStart(2,'0')}:${String(total % 60).padStart(2,'0')}`;
 }
+export function validateRoutineSchedule(routine) {
+  if (!routine.finishTime) return 'Choose a routine complete time.';
+  for (let index = 1; index < (routine.phases || []).length; index++) {
+    if (routine.phases[index].time < routine.phases[index - 1].time) {
+      return `“${routine.phases[index].name || `Phase ${index + 1}`}” cannot start before the previous phase.`;
+    }
+  }
+  const laterPhase = (routine.phases || []).find(phase => phase.time > routine.finishTime);
+  if (laterPhase) return `Routine complete time cannot be earlier than “${laterPhase.name || 'a phase'}”.`;
+  return '';
+}
 export function timestampForRoutineFinish(routine, routineDate = dateKey()) {
   const phases = (routine.phases || []).filter(phase => phase.enabled !== false);
   return timestampForPhase([...phases, {time:routine.finishTime || defaultRoutineFinishTime(phases)}], phases.length, routineDate);

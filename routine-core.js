@@ -185,5 +185,5 @@ export function initialData() {
   const r={id:uid(),name:'School Morning',days:[1,2,3,4,5],finishTime:'08:00',phases:[
     phase('06:15','Meds / Get Ready','Take medicine\nGet dressed\nBrush teeth',['Take medicine','Get dressed','Brush teeth']), phase('06:30','Start Breakfast'),
     phase('06:50','Homework / School Organization'), phase('07:30','Pack Up / Final Prep'), phase('07:50','Leave for School') ]};
-  return {appVersion:'1.1.0',schemaVersion:1,routines:[r],activeRoutineId:r.id,preferences:{sound:'sunrise',volume:.7},keys:{next:'Enter',previous:'KeyP',delay:'Space',silence:'KeyD'},keyDefaultsVersion:2,runtimes:{}};
+  return {appVersion:'1.1.0',schemaVersion:1,routines:[r],activeRoutineId:r.id,preferences:{sound:'sunrise',volume:.7,idleMinutes:2,keepAwakeDuringAlarm:true},keys:{next:'Enter',previous:'KeyP',delay:'Space',silence:'KeyD'},keyDefaultsVersion:2,runtimes:{}};
 }

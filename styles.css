@@ -20,24 +20,25 @@ main{width:100%;height:100%;min-height:0;overflow:hidden;padding-top:clamp(.5rem
 #run .schedule-strip strong{font-size:clamp(1.25rem,3.5vmin,2.25rem)}
 #run .timer{font-size:clamp(3rem,11vh,8rem);line-height:.82}
 #run .timer-label{font-size:clamp(.9rem,2.4vh,1.6rem)}
-#run .countdown-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,25%);align-items:center;gap:clamp(.75rem,2vw,1.5rem);flex:none}
+#run .countdown-row{display:grid;grid-template-columns:minmax(150px,25%) minmax(0,1fr);align-items:center;gap:clamp(.75rem,2vw,1.5rem);flex:none}
 #run .countdown{min-width:0}
-#run .next-indicator{min-width:0;padding:.55rem 0 .55rem clamp(.75rem,2vw,1.25rem);border-left:1px solid #ffffff2b;color:#a9bdd0}
-#run .next-indicator span{display:block;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.12em;font-size:clamp(.65rem,1.4vmin,.78rem);font-weight:900}
-#run .next-indicator strong{display:block;overflow-wrap:anywhere;color:#d7e2ec;font-size:clamp(.95rem,2vmin,1.3rem);line-height:1.15}
+#run .phase-times{display:grid;min-width:0;gap:.5rem;padding:.4rem clamp(.75rem,2vw,1.25rem) .4rem 0;border-right:1px solid #ffffff2b;color:#a9bdd0}
+#run .phase-times div+div{padding-top:.5rem;border-top:1px solid #ffffff1c}
+#run .phase-times span{display:block;margin-bottom:.15rem;text-transform:uppercase;letter-spacing:.12em;font-size:clamp(.65rem,1.4vmin,.78rem);font-weight:900}
+#run .phase-times strong{display:block;overflow-wrap:anywhere;color:#d7e2ec;font-size:clamp(.95rem,2vmin,1.3rem);line-height:1.15}
 #run .current-heading{display:flex;align-items:start;justify-content:space-between;gap:1rem;flex:none}
 #run .heading-status{display:flex;align-items:flex-end;gap:.5rem;flex-direction:column}
 #run .current-scheduled{display:grid;gap:.15rem;text-align:right;color:#9db1c5;white-space:nowrap}
 #run .current-scheduled span{text-transform:uppercase;letter-spacing:.12em;font-size:.65rem;font-weight:900}
 #run .current-scheduled strong{color:#d7e2ec;font-size:1rem}
-#run .run-checklist{grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));align-content:start;gap:clamp(.3rem,.8vh,.5rem)}
-#run .run-checklist label{align-items:flex-start;padding:clamp(.42rem,.8vh,.6rem);font-size:clamp(.88rem,1.8vmin,1.08rem);line-height:1.15;overflow-wrap:anywhere}
-#run .run-checklist input{width:1.4rem;height:1.4rem;margin:0;flex:none}
+#run .run-checklist{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));grid-auto-rows:minmax(3.25rem,1fr);align-content:stretch;gap:clamp(.4rem,1vh,.7rem)}
+#run .run-checklist label{align-items:center;padding:clamp(.55rem,1.25vh,1rem);font-size:clamp(1rem,2.5vmin,1.5rem);line-height:1.15;overflow-wrap:anywhere}
+#run .run-checklist input{width:clamp(1.65rem,3vmin,2.25rem);height:clamp(1.65rem,3vmin,2.25rem);margin:0;flex:none}
 #run .delay-note{font-size:clamp(.9rem,2vh,1.3rem);min-height:1.4em}
 #run .actions{gap:clamp(.4rem,1vw,1rem)}
 #run .actions button{min-height:clamp(58px,9vh,90px);font-size:clamp(1rem,2.3vmin,1.65rem)}
 
-@media(max-width:700px){header{padding:.4rem .6rem}header nav{width:100%;justify-content:center;gap:.25rem}header nav button{padding:.55rem .65rem;font-size:.82rem}main{padding:.5rem}#run .run-grid,#run .run-grid.has-checklist{display:block}#run .hero{padding:.7rem}.run-checklist{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))}#run .countdown-row{grid-template-columns:minmax(0,1fr);gap:.65rem}#run .countdown-row .timer{font-size:clamp(2.6rem,17vw,5rem);white-space:nowrap}#run .next-indicator{padding:.65rem 0 0;border-left:0;border-top:1px solid #ffffff2b;text-align:center}#run .actions{grid-template-columns:repeat(3,minmax(0,1fr))}#run .actions.two-actions{grid-template-columns:repeat(2,minmax(0,1fr))}#run .actions button{min-width:0;min-height:52px;padding:.55rem .25rem;font-size:clamp(.82rem,3.7vw,1.1rem)}#run .actions button small{display:none}.run-context{padding:.45rem .65rem}}
+@media(max-width:700px){header{padding:.4rem .6rem}header nav{width:100%;justify-content:center;gap:.25rem}header nav button{padding:.55rem .65rem;font-size:.82rem}main{padding:.5rem}#run .run-grid,#run .run-grid.has-checklist{display:block}#run .hero{padding:.7rem}.run-checklist{grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr))}#run .countdown-row{grid-template-columns:minmax(9rem,35%) minmax(0,1fr);gap:.65rem}#run .countdown-row .timer{font-size:clamp(2.6rem,14vw,5rem);white-space:nowrap}#run .phase-times{padding:.35rem .65rem .35rem 0;text-align:left}#run .actions{grid-template-columns:repeat(3,minmax(0,1fr))}#run .actions.two-actions{grid-template-columns:repeat(2,minmax(0,1fr))}#run .actions button{min-width:0;min-height:52px;padding:.55rem .25rem;font-size:clamp(.82rem,3.7vw,1.1rem)}#run .actions button small{display:none}.run-context{padding:.45rem .65rem}}
 @media(max-height:700px){#run{gap:.3rem}#run .run-context{padding:.35rem .65rem}#run .schedule-strip{padding:.35rem}#run .timer{font-size:clamp(2.5rem,9vh,5rem)}#run .eyebrow{font-size:.7rem}#run .actions button{min-height:48px}}
 
 /* Tablet browsers retain sizeable address and tab bars in landscape.  In that

@@ -1,4 +1,5 @@
 const IS_GD_ENDPOINT='https://is.gd/create.php';
+let jsonpRequestId=0;
 
 export function isGdRequestUrl(longUrl,callback){
   const request=new URL(IS_GD_ENDPOINT);
@@ -23,7 +24,10 @@ async function shortenWithFetch(longUrl,fetchImpl){
 
 function shortenWithJsonp(longUrl){
   return new Promise((resolve,reject)=>{
-    const callback=`routineBeaconShortUrl_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    // is.gd only accepts short, alphanumeric JSONP callback names. The former
+    // descriptive name exceeded that limit, so is.gd rejected the request and
+    // sharing silently fell back to the original URL.
+    const callback=`isgd${Date.now().toString(36)}${(jsonpRequestId++).toString(36)}`;
     const script=document.createElement('script');
     const cleanup=()=>{clearTimeout(timer);script.remove();delete globalThis[callback]};
     const fail=error=>{cleanup();reject(error)};

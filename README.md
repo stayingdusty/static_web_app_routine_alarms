@@ -26,7 +26,7 @@ All data is stored as one versioned document in `localStorage` under `routineBea
 
 **Export settings** downloads that document as a readable JSON backup. **Import settings** parses and validates its schema and routine/phase shape, asks before replacement, then writes it to local storage. JSON is a backup format only; normal editing happens in the Routines and Settings screens.
 
-**Copy share link** creates a URL-safe Base64-encoded link containing the selected routine plus alarm and keyboard preferences. Opening a valid link adds a separate “Shared” copy, selects it, and removes the payload from the address bar. Share URLs require no server, but can become long for large routines and anyone with the link can read its contents; do not put sensitive information in a routine.
+**Copy share link** creates a URL-safe Base64-encoded link containing the selected routine plus alarm and keyboard preferences, then shortens it through [is.gd](https://is.gd/). QR previews use the same short link. If shortening is unavailable, the app falls back to the full link. Opening a valid link adds a separate “Shared” copy, selects it, and removes the payload from the address bar. Anyone with either form of the link can read its contents, and is.gd receives the full share URL when shortening it; do not put sensitive information in a routine.
 
 ## Timing and controls
 

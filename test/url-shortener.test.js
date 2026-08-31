@@ -11,8 +11,8 @@ test('is.gd request includes the complete share URL',()=>{
 });
 
 test('is.gd request includes a JSONP callback when provided',()=>{
-  const request=new URL(isGdRequestUrl('https://example.com/share','routineBeaconShortUrl_1'));
-  assert.equal(request.searchParams.get('callback'),'routineBeaconShortUrl_1');
+  const request=new URL(isGdRequestUrl('https://example.com/share','isgd123'));
+  assert.equal(request.searchParams.get('callback'),'isgd123');
 });
 
 test('shortener returns the is.gd URL from a successful response',async()=>{
@@ -38,7 +38,9 @@ test('shortener uses JSONP in a browser to avoid CORS',async()=>{
   try{
     assert.equal(await shortenUrl('https://example.com/share'),'https://is.gd/jsonp1');
     assert.equal(requestedUrl.searchParams.get('url'),'https://example.com/share');
-    assert.match(requestedUrl.searchParams.get('callback'),/^routineBeaconShortUrl_/);
+    const callback=requestedUrl.searchParams.get('callback');
+    assert.match(callback,/^isgd[a-z0-9]+$/);
+    assert.ok(callback.length<=20);
   }finally{
     if(originalDocument===undefined)delete globalThis.document;
     else globalThis.document=originalDocument;

@@ -11,8 +11,8 @@ test('is.gd request includes the complete share URL',()=>{
 });
 
 test('is.gd request includes a JSONP callback when provided',()=>{
-  const request=new URL(isGdRequestUrl('https://example.com/share','isgd123'));
-  assert.equal(request.searchParams.get('callback'),'isgd123');
+  const request=new URL(isGdRequestUrl('https://example.com/share','isgd_cb_123_abc'));
+  assert.equal(request.searchParams.get('callback'),'isgd_cb_123_abc');
 });
 
 test('shortener returns the is.gd URL from a successful response',async()=>{
@@ -27,7 +27,9 @@ test('shortener rejects API errors and unexpected URLs',async()=>{
 
 test('shortener uses JSONP in a browser to avoid CORS',async()=>{
   const originalDocument=globalThis.document;
+  const originalWindow=globalThis.window;
   let requestedUrl;
+  globalThis.window=globalThis;
   globalThis.document={
     createElement:()=>({remove(){}}),
     head:{append(script){
@@ -39,10 +41,11 @@ test('shortener uses JSONP in a browser to avoid CORS',async()=>{
     assert.equal(await shortenUrl('https://example.com/share'),'https://is.gd/jsonp1');
     assert.equal(requestedUrl.searchParams.get('url'),'https://example.com/share');
     const callback=requestedUrl.searchParams.get('callback');
-    assert.match(callback,/^isgd[a-z0-9]+$/);
-    assert.ok(callback.length<=20);
+    assert.match(callback,/^isgd_cb_\d+_[a-z0-9]+$/);
   }finally{
     if(originalDocument===undefined)delete globalThis.document;
     else globalThis.document=originalDocument;
+    if(originalWindow===undefined)delete globalThis.window;
+    else globalThis.window=originalWindow;
   }
 });

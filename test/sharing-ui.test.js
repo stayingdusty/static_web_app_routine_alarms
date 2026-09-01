@@ -6,10 +6,13 @@ const app=readFileSync(new URL('../app.js',import.meta.url),'utf8');
 const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
 const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
 
-test('sharing stays inside the initiating gesture and QR generation is local',()=>{
-  assert.match(app,/function copyShareLink\(\)\{copyText\(routineShareUrl\(\)\)\}/);
+test('sharing shortens links and keeps QR generation local',()=>{
+  assert.match(app,/import \{shortenUrl\} from '\.\/url-shortener\.js'/);
+  assert.match(app,/async function shortRoutineShareUrl\(\).*await shortenUrl\(longUrl\)/);
+  assert.match(app,/async function copyShareLink\(\).*shortRoutineShareUrl\(\)/);
+  assert.match(app,/async function showQrPreview\(\).*shortRoutineShareUrl\(\)/);
   assert.match(app,/preview\.replaceChildren\(qrCanvas\(qrShareUrl\)\)/);
-  assert.doesNotMatch(app,/api\.qrserver\.com|shortRoutineShareUrl/);
+  assert.doesNotMatch(app,/api\.qrserver\.com/);
   assert.match(app,/document\.execCommand\('copy'\)/);
   assert.match(html,/id="qrPreview" role="img"/);
 });

@@ -50,3 +50,7 @@ The application uses a fixed-height shell so the browser page itself never scrol
 - Screen Wake Lock is requested in Run Mode and reacquired when visible, but is unavailable in some browsers and may be revoked by the OS or low battery.
 - PWA installation depends on browser/platform support. The manifest and simple application-shell service worker allow installation and offline reuse after a successful first load.
 - `localStorage` belongs to a particular browser/origin and can be erased by browser settings; export backups regularly.
+
+## Duration-based routines
+
+A routine can instead use **Start anytime · phase durations** in the editor. This mode has no weekday or finish-time schedule: pressing Start begins the first phase immediately, and each phase counts down its configured hours and minutes. Finishing early carries the unused time into the next phase. Going back pauses the current phase and resumes the exact time that remained in the earlier phase. Alarms sound when the active phase reaches zero, and the date-keyed runtime remembers progress and completion for the rest of the local day.

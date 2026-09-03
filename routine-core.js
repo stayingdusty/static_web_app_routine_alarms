@@ -42,6 +42,10 @@ export function defaultRoutineFinishTime(phases = []) {
   return `${String(Math.floor(total / 60)).padStart(2,'0')}:${String(total % 60).padStart(2,'0')}`;
 }
 export function validateRoutineSchedule(routine) {
+  if (routine.mode === 'duration') {
+    const invalid = (routine.phases || []).find(phase => !Number.isFinite(Number(phase.durationMinutes)) || Number(phase.durationMinutes) < 1);
+    return invalid ? `Choose a duration of at least one minute for “${invalid.name || 'a phase'}”.` : '';
+  }
   if (!routine.finishTime) return 'Choose a routine complete time.';
   for (let index = 1; index < (routine.phases || []).length; index++) {
     if (routine.phases[index].time < routine.phases[index - 1].time) {
@@ -91,6 +95,21 @@ export function formatDuration(ms) {
 export function delayAlarm(effective, now, isDue) {
   return (isDue || effective <= now ? now : effective) + 60000;
 }
+export function beginDurationPhase(runtime, phase, now = Date.now(), carryMs = 0) {
+  runtime.durationStates ||= {};
+  const saved = runtime.durationStates[phase.id];
+  const remainingMs = saved ? saved.remainingMs + carryMs : Number(phase.durationMinutes) * 60000 + carryMs;
+  runtime.durationStates[phase.id] = {remainingMs, startedAt: now};
+  runtime.effectiveAlarm = now + remainingMs;
+  return runtime.effectiveAlarm;
+}
+export function pauseDurationPhase(runtime, phase, now = Date.now()) {
+  runtime.durationStates ||= {};
+  const state = runtime.durationStates[phase.id];
+  const remainingMs = Math.max(0, state ? state.remainingMs - (now - state.startedAt) : 0);
+  runtime.durationStates[phase.id] = {remainingMs, startedAt: null};
+  return remainingMs;
+}
 export function phaseContext(phases, phaseIndex) {
   return {
     current: phaseIndex >= 0 ? phases[phaseIndex] || null : null,
@@ -119,10 +138,11 @@ export function decodeSharePayload(value) {
 }
 const routineShape = routine => ({
   name: routine.name,
+  mode: routine.mode || 'schedule',
   days: routine.days || [],
   finishTime: routine.finishTime || defaultRoutineFinishTime(routine.phases),
   phases: (routine.phases || []).map(phase => ({
-    time: phase.time, name: phase.name, description: phase.description || '', checklist: phase.checklist || [],
+    time: phase.time || null, durationMinutes: Number(phase.durationMinutes) || 0, name: phase.name, description: phase.description || '', checklist: phase.checklist || [],
     alarm: phase.alarm !== false, enabled: phase.enabled !== false, sound: phase.sound || 'sunrise',
   })),
 });
@@ -147,18 +167,19 @@ export function addSharedRoutine(config, sharedRoutine) {
 }
 export function encodeRoutineShare(routine) {
   const compact = routineShape(routine);
-  return encodeSharePayload({v:3,r:[compact.name,compact.days,compact.finishTime,compact.phases.map(p=>[
-    p.time,p.name,p.description,p.checklist,p.alarm?1:0,p.enabled?1:0,p.sound,
+  return encodeSharePayload({v:4,r:[compact.name,compact.days,compact.finishTime,compact.mode,compact.phases.map(p=>[
+    p.time,p.name,p.description,p.checklist,p.alarm?1:0,p.enabled?1:0,p.sound,p.durationMinutes,
   ])]});
 }
 export function decodeRoutineShare(value) {
   const payload = decodeSharePayload(value);
-  if (![2,3].includes(payload.v) || !Array.isArray(payload.r)) return payload;
-  const [name,days,finishOrPhases,sharedPhases] = payload.r;
-  const phases = payload.v === 3 ? sharedPhases : finishOrPhases;
-  const finishTime = payload.v === 3 ? finishOrPhases : defaultRoutineFinishTime(phases.map(p=>({time:p[0]})));
-  return {schemaVersion:1,routine:{id:uid(),name,days,finishTime,phases:phases.map(p=>({
-    id:uid(),time:p[0],name:p[1],description:p[2]||'',checklist:p[3]||[],alarm:p[4]!==0,enabled:p[5]!==0,sound:p[6]||'sunrise',
+  if (![2,3,4].includes(payload.v) || !Array.isArray(payload.r)) return payload;
+  const [name,days,finishOrPhases,modeOrPhases,v4Phases] = payload.r;
+  const phases = payload.v === 4 ? v4Phases : payload.v === 3 ? modeOrPhases : finishOrPhases;
+  const finishTime = payload.v >= 3 ? finishOrPhases : defaultRoutineFinishTime(phases.map(p=>({time:p[0]})));
+  const mode = payload.v === 4 ? modeOrPhases : 'schedule';
+  return {schemaVersion:1,routine:{id:uid(),name,days,finishTime,mode,phases:phases.map(p=>({
+    id:uid(),time:p[0],name:p[1],description:p[2]||'',checklist:p[3]||[],alarm:p[4]!==0,enabled:p[5]!==0,sound:p[6]||'sunrise',durationMinutes:Number(p[7])||(mode === 'duration' ? 15 : 0),
   }))}};
 }
 export function freshRuntime(routineId, date = dateKey()) {
@@ -171,6 +192,7 @@ export function freshRuntime(routineId, date = dateKey()) {
     started: false,
     alarmStates: {},
     checklistStates: {},
+    durationStates: {},
     modelVersion: 4,
   };
 }
@@ -188,12 +210,12 @@ export function validConfig(value) {
   return value && value.schemaVersion === 1 && Array.isArray(value.routines) &&
     value.routines.every(r => typeof r.id==='string' && typeof r.name==='string' &&
       (r.finishTime === undefined || /^\d\d:\d\d$/.test(r.finishTime)) && Array.isArray(r.phases) &&
-      r.phases.every(p => typeof p.id==='string' && typeof p.name==='string' && /^\d\d:\d\d$/.test(p.time) &&
+      r.phases.every(p => typeof p.id==='string' && typeof p.name==='string' && ((r.mode==='duration' && Number(p.durationMinutes)>=1) || /^\d\d:\d\d$/.test(p.time)) &&
         (p.checklist === undefined || (Array.isArray(p.checklist) && p.checklist.every(item => typeof item === 'string')))));
 }
 export function initialData() {
   const phase=(time,name,description='',checklist=[])=>({id:uid(),time,name,description,checklist,alarm:true,enabled:true,sound:'sunrise'});
-  const r={id:uid(),name:'School Morning',days:[1,2,3,4,5],finishTime:'08:00',phases:[
+  const r={id:uid(),name:'School Morning',mode:'schedule',days:[1,2,3,4,5],finishTime:'08:00',phases:[
     phase('06:15','Meds / Get Ready','Take medicine\nGet dressed\nBrush teeth',['Take medicine','Get dressed','Brush teeth']), phase('06:30','Start Breakfast'),
     phase('06:50','Homework / School Organization'), phase('07:30','Pack Up / Final Prep'), phase('07:50','Leave for School') ]};
   return {appVersion:'1.1.0',schemaVersion:1,routines:[r],activeRoutineId:r.id,preferences:{sound:'sunrise',volume:.7,idleMinutes:2,keepAwakeDuringAlarm:true},keys:{next:'Enter',previous:'KeyP',delay:'Space',silence:'KeyD'},keyDefaultsVersion:2,runtimes:{}};

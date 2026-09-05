@@ -110,6 +110,16 @@ export function pauseDurationPhase(runtime, phase, now = Date.now()) {
   runtime.durationStates[phase.id] = {remainingMs, startedAt: null};
   return remainingMs;
 }
+export function advanceDurationPhase(runtime, phases, now = Date.now()) {
+  const current = phases[runtime.phaseIndex];
+  if (!current) return false;
+  const carryMs = pauseDurationPhase(runtime, current, now);
+  runtime.phaseIndex++;
+  runtime.effectiveAlarm = null;
+  const next = phases[runtime.phaseIndex];
+  if (next) beginDurationPhase(runtime, next, now, carryMs);
+  return Boolean(next);
+}
 export function phaseContext(phases, phaseIndex) {
   return {
     current: phaseIndex >= 0 ? phases[phaseIndex] || null : null,

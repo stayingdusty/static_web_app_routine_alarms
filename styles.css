@@ -69,6 +69,19 @@ main{width:100%;height:100%;min-height:0;overflow:hidden;padding-top:clamp(.5rem
 @media (max-width:850px), (max-height:620px){#run{overflow-y:auto;padding-right:1px}#run .run-grid{flex:0 0 auto;min-height:220px}#run .hero{height:auto;min-height:220px}#run .actions{position:relative;bottom:auto;width:100%}}
 @supports not (overflow-wrap:anywhere){.next-description,.run-checklist span,.run-context strong{word-break:break-word}}
 
+/* A short landscape viewport has substantially more horizontal than vertical
+   room. Put the phase card beside the countdown and controls instead of
+   stacking every section and then scrolling the otherwise sparse screen. */
+@media (min-width:701px) and (max-height:620px) and (orientation:landscape){
+  #run:has(> .run-grid){display:grid;grid-template-columns:minmax(0,1fr) minmax(19rem,.82fr);grid-template-rows:0 minmax(0,1fr) auto auto;column-gap:clamp(.65rem,1.5vw,1rem);row-gap:clamp(.3rem,1vh,.55rem);overflow:hidden;padding-right:0}
+  #run:has(> .run-grid)>.run-context{grid-column:1/-1;grid-row:1}
+  #run:has(> .run-grid)>.run-grid{grid-column:1;grid-row:2/5;min-height:0;height:100%}
+  #run:has(> .run-grid)>.run-grid .hero{height:100%;min-height:0}
+  #run:has(> .run-grid)>.countdown-row,#run:has(> .run-grid)>.schedule-strip{grid-column:2;grid-row:2;align-self:center}
+  #run:has(> .run-grid)>.delay-note{grid-column:2;grid-row:3}
+  #run:has(> .run-grid)>.actions{grid-column:2;grid-row:4}
+}
+
 .schedule-help{margin:.8rem 0 .35rem;color:#a9bdd0}.days label:has(input:checked){background:#087f8c;color:white}.queue-ready{text-align:center;display:grid;place-content:center;gap:1rem}.queue-ready p{font-size:clamp(1.05rem,2.5vw,1.45rem);max-width:750px;margin:.25rem auto;color:#cbd5e1}.queue-time{font-size:clamp(1.6rem,4vw,2.5rem)!important;font-weight:900;color:var(--cyan)!important}.queue-actions{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:1rem}.queue-actions button{min-height:80px;font-size:clamp(1rem,2.5vw,1.5rem)}
 
 /* The editor is scoped to one routine. Navigation back to the routine list is
